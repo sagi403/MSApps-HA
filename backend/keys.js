@@ -5,6 +5,8 @@ dotenv.config();
 const keys = {
   port: process.env.PORT,
   nodeEnv: process.env.NODE_ENV,
+  baseUrl: process.env.BASE_URL,
+  apiKey: process.env.API_KEY,
 };
 
 const checkEnvVariables = keys => {
