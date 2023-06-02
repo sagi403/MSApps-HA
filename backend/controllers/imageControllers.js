@@ -9,7 +9,7 @@ const getImages = asyncHandler(async (req, res) => {
   const pageSize = 9;
 
   const page = +req.query.pageNumber || 1;
-  const category = req.query.pageNumber || "category";
+  const category = req.query.category || "category";
 
   const { data } = await pixabayApi.get(
     `/?key=${keys.apiKey}&q=${category}&per_page=${pageSize}&page=${page}`
@@ -17,7 +17,9 @@ const getImages = asyncHandler(async (req, res) => {
 
   const imagesDetails = data.hits.sort((a, b) => a.id - b.id);
 
-  const images = imagesDetails.map(image => image.webformatURL);
+  const images = imagesDetails.map(image => {
+    return { url: image.webformatURL, id: image.id };
+  });
 
   if (images.length !== 0) {
     res.json({ images });
