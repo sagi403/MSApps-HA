@@ -9,9 +9,11 @@ const initialState = {
 
 export const getImages = createAsyncThunk(
   "image/getImages",
-  async (_, thunkApi) => {
+  async (page, thunkApi) => {
     try {
-      const { data } = await imagesApi.get("/api/images");
+      const { data } = await imagesApi.get(
+        `/api/images?pageNumber=${page || 1}`
+      );
 
       return data.images;
     } catch (error) {
@@ -28,6 +30,11 @@ export const getImages = createAsyncThunk(
 const imageSlice = createSlice({
   name: "image",
   initialState,
+  reducers: {
+    resetStatus: state => {
+      state.error = null;
+    },
+  },
   extraReducers: builder => {
     builder
       .addCase(getImages.pending, state => {
@@ -43,5 +50,7 @@ const imageSlice = createSlice({
       });
   },
 });
+
+export const { resetStatus } = imageSlice.actions;
 
 export default imageSlice.reducer;
