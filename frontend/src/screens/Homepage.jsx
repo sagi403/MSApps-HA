@@ -4,24 +4,29 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getImages, resetStatus } from "../store/imageSlice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import CategoryModal from "../components/CategoryModal";
 
 const Homepage = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const page = +new URLSearchParams(location.search).get("pageNumber") || 1;
+  const pageUrl = +new URLSearchParams(location.search).get("pageNumber") || 1;
+  const categoryUrl =
+    new URLSearchParams(location.search).get("category") || "category";
 
-  const [currentPage, setCurrentPage] = useState(page);
+  const [currentPage, setCurrentPage] = useState(pageUrl);
+  const [category, setCategory] = useState(categoryUrl);
+  const [showModal, setShowModal] = useState(false);
 
   const { images, loading, error } = useSelector(state => state.image);
 
   useEffect(() => {
-    dispatch(getImages({ page: currentPage }));
-    navigate(`/?pageNumber=${currentPage}`);
+    dispatch(getImages({ page: currentPage, category }));
+    navigate(`/?pageNumber=${currentPage}&category=${category}`);
 
     return () => dispatch(resetStatus());
-  }, [navigate, dispatch, currentPage]);
+  }, [navigate, dispatch, currentPage, category]);
 
   const handleNext = () => {
     if (images?.urls.length === 9) {
@@ -41,7 +46,13 @@ const Homepage = () => {
         <button onClick={handlePrev} className="btn">
           Prev
         </button>
-        <button className="btn">Category</button>
+        <button
+          onClick={() => setShowModal(true)}
+          className="btn"
+          type="button"
+        >
+          Category
+        </button>
         <button onClick={handleNext} className="btn">
           Next
         </button>
@@ -63,6 +74,16 @@ const Homepage = () => {
               </div>
             ))}
         </div>
+      )}
+      {showModal && (
+        <CategoryModal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          onCategoryPick={category => {
+            setCategory(category);
+            setCurrentPage(1);
+          }}
+        />
       )}
     </div>
   );
