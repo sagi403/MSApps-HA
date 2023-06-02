@@ -4,18 +4,30 @@ import imagesApi from "../api/images";
 const initialState = {
   loading: true,
   error: null,
-  images: null,
+  images: localStorage.getItem("imagesList")
+    ? JSON.parse(localStorage.getItem("imagesList"))
+    : null,
 };
 
 export const getImages = createAsyncThunk(
   "image/getImages",
-  async (page, thunkApi) => {
+  async ({ page = 1, category = "category" }, thunkApi) => {
+    const imagesState = thunkApi.getState()?.image?.images;
+
+    if (
+      imagesState &&
+      imagesState.page === page &&
+      imagesState.category === category
+    ) {
+      return imagesState;
+    }
+
     try {
       const { data } = await imagesApi.get(
-        `/api/images?pageNumber=${page || 1}`
+        `/api/images?pageNumber=${page}&category=${category}`
       );
 
-      return data.images;
+      return { page, category, urls: data.images };
     } catch (error) {
       const err =
         error.response && error.response.data.message
@@ -43,6 +55,8 @@ const imageSlice = createSlice({
       .addCase(getImages.fulfilled, (state, action) => {
         state.loading = false;
         state.images = action.payload;
+
+        localStorage.setItem("imagesList", JSON.stringify(state.images));
       })
       .addCase(getImages.rejected, (state, action) => {
         state.loading = false;

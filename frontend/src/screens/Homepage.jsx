@@ -17,14 +17,14 @@ const Homepage = () => {
   const { images, loading, error } = useSelector(state => state.image);
 
   useEffect(() => {
-    dispatch(getImages(currentPage));
+    dispatch(getImages({ page: currentPage }));
     navigate(`/?pageNumber=${currentPage}`);
 
     return () => dispatch(resetStatus());
   }, [navigate, dispatch, currentPage]);
 
   const handleNext = () => {
-    if (images.length === 9) {
+    if (images?.urls.length === 9) {
       setCurrentPage(currentPage + 1);
     }
   };
@@ -52,8 +52,8 @@ const Homepage = () => {
         <Message message={error} />
       ) : (
         <div className="grid grid-cols-3 gap-4">
-          {images &&
-            images.map(image => (
+          {images?.urls &&
+            images?.urls.map(image => (
               <div key={image.id} className="w-full h-64">
                 <img
                   src={image.url}
