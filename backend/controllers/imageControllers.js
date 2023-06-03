@@ -29,4 +29,16 @@ const getImages = asyncHandler(async (req, res) => {
   }
 });
 
-export { getImages };
+// @desc    Fetch images
+// @route   GET /api/images/:id
+// @access  Public
+const getImageDetail = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { data } = await pixabayApi.get(`/?key=${keys.apiKey}&id=${id}`);
+
+  const imageDetails = data.hits[0];
+
+  res.json({ data: imageDetails });
+});
+
+export { getImages, getImageDetail };
