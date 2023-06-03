@@ -29,7 +29,7 @@ const getImages = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Fetch images
+// @desc    Fetch image details
 // @route   GET /api/images/:id
 // @access  Public
 const getImageDetail = asyncHandler(async (req, res) => {

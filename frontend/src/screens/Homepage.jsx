@@ -5,6 +5,7 @@ import { getImages, resetStatus } from "../store/imageSlice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import CategoryModal from "../components/CategoryModal";
+import ItemModal from "../components/ItemModal";
 
 const Homepage = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,9 @@ const Homepage = () => {
 
   const [currentPage, setCurrentPage] = useState(pageUrl);
   const [category, setCategory] = useState(categoryUrl);
-  const [showModal, setShowModal] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showItemModal, setShowItemModal] = useState(false);
+  const [itemId, setItemId] = useState("");
 
   const { images, loading, error } = useSelector(state => state.image);
 
@@ -47,7 +50,7 @@ const Homepage = () => {
           Prev
         </button>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowCategoryModal(true)}
           className="btn"
           type="button"
         >
@@ -69,20 +72,31 @@ const Homepage = () => {
                 <img
                   src={image.url}
                   alt={image.url}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() => {
+                    setShowItemModal(true);
+                    setItemId(image.id);
+                  }}
                 />
               </div>
             ))}
         </div>
       )}
-      {showModal && (
+      {showCategoryModal && (
         <CategoryModal
-          show={showModal}
-          onHide={() => setShowModal(false)}
+          show={showCategoryModal}
+          onHide={() => setShowCategoryModal(false)}
           onCategoryPick={category => {
             setCategory(category);
             setCurrentPage(1);
           }}
+        />
+      )}
+      {showItemModal && (
+        <ItemModal
+          show={showItemModal}
+          onHide={() => setShowItemModal(false)}
+          itemId={itemId}
         />
       )}
     </div>

@@ -4,9 +4,12 @@ import imagesApi from "../api/images";
 const initialState = {
   loading: true,
   error: null,
+  loadingDetails: true,
+  errorDetails: null,
   images: localStorage.getItem("imagesList")
     ? JSON.parse(localStorage.getItem("imagesList"))
     : null,
+  imageDetails: null,
 };
 
 export const getImages = createAsyncThunk(
@@ -39,12 +42,31 @@ export const getImages = createAsyncThunk(
   }
 );
 
+export const getImageDetails = createAsyncThunk(
+  "image/getImageDetails",
+  async (id, thunkApi) => {
+    try {
+      const { data } = await imagesApi.get(`/api/images/${id}`);
+
+      return data.data;
+    } catch (error) {
+      const err =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+
+      return thunkApi.rejectWithValue(err);
+    }
+  }
+);
+
 const imageSlice = createSlice({
   name: "image",
   initialState,
   reducers: {
     resetStatus: state => {
       state.error = null;
+      state.errorDetails = null;
     },
   },
   extraReducers: builder => {
@@ -61,6 +83,17 @@ const imageSlice = createSlice({
       .addCase(getImages.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(getImageDetails.pending, state => {
+        state.loadingDetails = true;
+      })
+      .addCase(getImageDetails.fulfilled, (state, action) => {
+        state.loadingDetails = false;
+        state.imageDetails = action.payload;
+      })
+      .addCase(getImageDetails.rejected, (state, action) => {
+        state.loadingDetails = false;
+        state.errorDetails = action.payload;
       });
   },
 });

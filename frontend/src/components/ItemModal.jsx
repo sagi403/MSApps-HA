@@ -1,13 +1,20 @@
-import { useState } from "react";
 import PropTypes from "prop-types";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getImageDetails } from "../store/imageSlice";
+import Loader from "./Loader";
+import Message from "./Message";
 
-const CategoryModal = ({ show, onHide, onCategoryPick }) => {
-  const [category, setCategory] = useState("");
+const ItemModal = ({ show, onHide, itemId }) => {
+  const dispatch = useDispatch();
 
-  const handleCategoryPick = () => {
-    onCategoryPick(category);
-    onHide();
-  };
+  const { imageDetails, loadingDetails, errorDetails } = useSelector(
+    state => state.image
+  );
+
+  useEffect(() => {
+    dispatch(getImageDetails(itemId));
+  }, []);
 
   return (
     <div
@@ -41,33 +48,30 @@ const CategoryModal = ({ show, onHide, onCategoryPick }) => {
           </button>
           <div className="px-6 py-6 lg:px-8">
             <h3 className="mb-4 text-xl font-medium text-gray-900 dark:text-white">
-              Search for all images
+              Details on the image
             </h3>
-            <div className="mb-6">
-              <label
-                htmlFor="email"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Category
-              </label>
-              <input
-                type="text"
-                name="category"
-                id="category"
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Category"
-                required
-              />
-            </div>
+
+            <ul className="mb-4 overflow-x-auto">
+              {loadingDetails ? (
+                <Loader />
+              ) : errorDetails ? (
+                <Message message="There are no available details on this image " />
+              ) : (
+                Object.entries(imageDetails).map(([key, value], index) => (
+                  <li key={index} className="whitespace-nowrap">
+                    <span className="underline">{`${key}`}</span>
+                    {`: ${value}`}
+                  </li>
+                ))
+              )}
+            </ul>
 
             <button
               type="submit"
               className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              onClick={() => handleCategoryPick()}
+              onClick={onHide}
             >
-              Search
+              Close
             </button>
           </div>
         </div>
@@ -76,10 +80,10 @@ const CategoryModal = ({ show, onHide, onCategoryPick }) => {
   );
 };
 
-CategoryModal.propTypes = {
+ItemModal.propTypes = {
   show: PropTypes.bool,
   onHide: PropTypes.func,
-  onCategoryPick: PropTypes.func,
+  itemId: PropTypes.number,
 };
 
-export default CategoryModal;
+export default ItemModal;
