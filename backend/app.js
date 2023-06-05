@@ -8,7 +8,7 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 const app = express();
 
 var corsOptions = {
-  origin: ["http://localhost:5173", "https://my-other-trusted-origin.com"],
+  origin: ["http://localhost:5173"],
 };
 
 app.use(cors(corsOptions));
